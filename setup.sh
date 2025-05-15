@@ -1,10 +1,29 @@
 #!/bin/bash
 
+echo "🔐 FILL THE ONELOGIN-API KEYS:
+sleep 10
+
 # Prompt for required values
-read -p "Enter ONELOGIN-CLIENT_ID: " CLIENT_ID
-read -p "Enter ONELOGIN-CLIENT_SECRET: " CLIENT_SECRET
+read -p "Enter CLIENT_ID: " CLIENT_ID
+read -p "Enter CLIENT_SECRET: " CLIENT_SECRET
 read -p "Enter REMOTE_HOST: " REMOTE_HOST
 read -p "Enter PORT: " PORT
+
+# Display inputs
+echo ""
+echo "You have entered the following:"
+echo "CLIENT_ID     : $CLIENT_ID"
+echo "CLIENT_SECRET : $CLIENT_SECRET"
+echo "REMOTE_HOST   : $REMOTE_HOST"
+echo "PORT          : $PORT"
+echo ""
+
+# Confirm installation
+read -p "Proceed with installation? (y/n): " confirm
+if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+    echo "❌ Installation cancelled."
+    exit 1
+fi
 
 # Create Python script
 cat <<EOF > /opt/onelogin_audit.py
@@ -22,7 +41,7 @@ USERS_URL = 'https://api.us.onelogin.com/api/2/users'
 REMOTE_HOST = '${REMOTE_HOST}'
 REMOTE_PORT = ${PORT}
 
-INTERVAL = 30  # 30  seconds
+INTERVAL = 30  # 30 seconds
 
 
 class OneLoginAPI:
