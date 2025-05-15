@@ -1,7 +1,6 @@
 #!/bin/bash
 
-echo "🔐 FILL THE ONELOGIN-API KEYS:
-sleep 10
+echo "🔐 FILL THE ONELOGIN-API KEYS:"
 
 # Prompt for required values
 read -p "Enter CLIENT_ID: " CLIENT_ID
@@ -27,6 +26,7 @@ fi
 
 # Create Python script
 cat <<EOF > /opt/onelogin_audit.py
+#!/usr/bin/env python3
 import time
 import requests
 import socket
@@ -54,9 +54,12 @@ class OneLoginAPI:
     def get_token(self):
         headers = {
             'Content-Type': 'application/json',
-            'Authorization': f'client_id:{self.client_id}, client_secret:{self.client_secret}'
         }
-        data = {'grant_type': 'client_credentials'}
+        data = {
+            'grant_type': 'client_credentials',
+            'client_id': self.client_id,
+            'client_secret': self.client_secret
+        }
 
         response = requests.post(TOKEN_URL, headers=headers, json=data)
         response.raise_for_status()
@@ -73,7 +76,7 @@ class OneLoginAPI:
     def get_users(self):
         self.ensure_token_valid()
         headers = {
-            'Authorization': f'bearer {self.access_token}',
+            'Authorization': f'Bearer {self.access_token}',
             'Content-Type': 'application/json'
         }
         response = requests.get(USERS_URL, headers=headers)
@@ -102,7 +105,6 @@ if __name__ == '__main__':
             print(f"[ERROR] {e}")
 
         time.sleep(INTERVAL)
-
 EOF
 
 # Ensure script is executable
@@ -115,7 +117,7 @@ Description=OneLogin Audit Script
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/python3 /opt/onelogin_audit.py
+ExecStart=/usr/bin/env python3 /opt/onelogin_audit.py
 Restart=always
 RestartSec=5
 User=root
