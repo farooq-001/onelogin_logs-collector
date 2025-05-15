@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Prompt for required values
-read -p "Enter CLIENT_ID: " CLIENT_ID
-read -p "Enter CLIENT_SECRET: " CLIENT_SECRET
+read -p "Enter ONELOGIN-CLIENT_ID: " CLIENT_ID
+read -p "Enter ONELOGIN-CLIENT_SECRET: " CLIENT_SECRET
 read -p "Enter REMOTE_HOST: " REMOTE_HOST
 read -p "Enter PORT: " PORT
 
