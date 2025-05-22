@@ -27,10 +27,12 @@ fi
 # Create Python script
 cat <<EOF > /opt/onelogin_audit.py
 #!/usr/bin/env python3
+#!/usr/bin/env python3
 import time
 import requests
 import socket
 import json
+import os
 
 CLIENT_ID = '${CLIENT_ID}'
 CLIENT_SECRET = '${CLIENT_SECRET}'
@@ -42,6 +44,7 @@ REMOTE_HOST = '${REMOTE_HOST}'
 REMOTE_PORT = ${PORT}
 
 INTERVAL = 30  # 30 seconds
+REGISTRY_FILE = 'onelogin_user_registry.json'
 
 
 class OneLoginAPI:
@@ -94,17 +97,44 @@ def send_logs_to_host(host, port, data):
         print(f"[ERROR] Failed to send logs: {e}")
 
 
+def load_registry():
+    if os.path.exists(REGISTRY_FILE):
+        with open(REGISTRY_FILE, 'r') as f:
+            return json.load(f)
+    return {}
+
+
+def save_registry(data):
+    with open(REGISTRY_FILE, 'w') as f:
+        json.dump(data, f, indent=2)
+        print(f"[INFO] Registry updated.")
+
+
+def users_changed(old_data, new_data):
+    return json.dumps(old_data, sort_keys=True) != json.dumps(new_data, sort_keys=True)
+
+
 if __name__ == '__main__':
     onelogin = OneLoginAPI(CLIENT_ID, CLIENT_SECRET)
+    user_registry = load_registry()
 
     while True:
         try:
-            logs = onelogin.get_users()
-            send_logs_to_host(REMOTE_HOST, REMOTE_PORT, logs)
+            latest_data = onelogin.get_users()
+
+            if users_changed(user_registry, latest_data):
+                print("[INFO] Changes detected, updating registry and sending logs.")
+                user_registry = latest_data
+                save_registry(user_registry)
+                send_logs_to_host(REMOTE_HOST, REMOTE_PORT, latest_data)
+            else:
+                print("[INFO] No changes in user data.")
+
         except Exception as e:
             print(f"[ERROR] {e}")
 
         time.sleep(INTERVAL)
+
 EOF
 
 # Ensure script is executable
