@@ -163,5 +163,5 @@ systemctl enable onelogin_audit.service
 systemctl start onelogin_audit.service
 
 echo "✅ OneLogin audit service installed and started."
-ech ""
+echo ""
 echo "🎯 View current user registry at: /opt/onelogin_user_registry.json"
