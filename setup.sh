@@ -25,8 +25,7 @@ if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
 fi
 
 # Create Python script
-cat <<EOF > /opt/onelogin_audit.py
-#!/usr/bin/env python3
+cat <<'EOF' > /opt/onelogin_audit.py
 #!/usr/bin/env python3
 import time
 import requests
@@ -44,7 +43,7 @@ REMOTE_HOST = '${REMOTE_HOST}'
 REMOTE_PORT = ${PORT}
 
 INTERVAL = 30  # 30 seconds
-REGISTRY_FILE = 'onelogin_user_registry.json'
+REGISTRY_FILE = '/opt/onelogin_user_registry.json'
 
 
 class OneLoginAPI:
@@ -55,19 +54,15 @@ class OneLoginAPI:
         self.token_expiry = 0
 
     def get_token(self):
-        headers = {
-            'Content-Type': 'application/json',
-        }
+        headers = {'Content-Type': 'application/json'}
         data = {
             'grant_type': 'client_credentials',
             'client_id': self.client_id,
             'client_secret': self.client_secret
         }
-
         response = requests.post(TOKEN_URL, headers=headers, json=data)
         response.raise_for_status()
         token_data = response.json()
-
         self.access_token = token_data['access_token']
         self.token_expiry = time.time() + token_data['expires_in'] - 60
         print(f"[INFO] Obtained new token, expires in {token_data['expires_in']} seconds.")
@@ -121,7 +116,6 @@ if __name__ == '__main__':
     while True:
         try:
             latest_data = onelogin.get_users()
-
             if users_changed(user_registry, latest_data):
                 print("[INFO] Changes detected, updating registry and sending logs.")
                 user_registry = latest_data
@@ -129,13 +123,17 @@ if __name__ == '__main__':
                 send_logs_to_host(REMOTE_HOST, REMOTE_PORT, latest_data)
             else:
                 print("[INFO] No changes in user data.")
-
         except Exception as e:
             print(f"[ERROR] {e}")
 
         time.sleep(INTERVAL)
-
 EOF
+
+# Replace placeholders with real values using sed
+sed -i "s|\${CLIENT_ID}|${CLIENT_ID}|g" /opt/onelogin_audit.py
+sed -i "s|\${CLIENT_SECRET}|${CLIENT_SECRET}|g" /opt/onelogin_audit.py
+sed -i "s|\${REMOTE_HOST}|${REMOTE_HOST}|g" /opt/onelogin_audit.py
+sed -i "s|\${PORT}|${PORT}|g" /opt/onelogin_audit.py
 
 # Ensure script is executable
 chmod +x /opt/onelogin_audit.py
@@ -165,4 +163,5 @@ systemctl enable onelogin_audit.service
 systemctl start onelogin_audit.service
 
 echo "✅ OneLogin audit service installed and started."
-echo "🎯 cat ~/onelogin_user_registry.json"
+ech ""
+echo "🎯 View current user registry at: /opt/onelogin_user_registry.json"
