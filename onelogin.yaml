@@ -1,0 +1,49 @@
+##################### Filebeat Configuration - PAF #########################
+
+#======================= Filebeat Inputs =============================
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - "/var/log/capture/alerts-*.json"
+  close_inactive: 10s
+  scan_frequency: 60s
+
+  fields:
+    log.type: "paf_alerts"
+    sensor_id: "DM_HY_S01"
+    client_id: "d3b6842d"
+  fields_under_root: true
+
+#================== Filebeat Global Options ===============================
+filebeat.registry.path: /opt/conf/etc/registry/onelogin
+
+#========================= Filebeat Modules ===============================
+filebeat.config.modules:
+  path: "${path.config}/modules.d/*.yml"
+  reload.enabled: true
+  reload.period: 60s
+
+#========================= Logstash Output ===============================
+output.logstash:
+  bulk_max_size: 8192
+  hosts: ["127.0.0.1:12154"]
+  loadbalance: true
+  worker: 5
+
+#============================= Logging ====================================
+logging.level: info
+logging.to_files: true
+logging.metrics.enabled: true
+logging.metrics.period: 60s
+logging.files:
+  path: /var/log/filebeat/
+  name: onelogin
+  keepfiles: 7
+
+#============================= Queue Settings ============================
+queue.mem:
+  events: 4096
+  flush.min_events: 512
+  flush.timeout: 1s
+
