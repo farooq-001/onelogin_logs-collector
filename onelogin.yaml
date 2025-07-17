@@ -28,6 +28,13 @@ output.logstash:
   worker: 5
   bulk_max_size: 8192
 
+#output.file:
+#  enabled: true
+#  path: "/opt/onelogin"
+#  filename: "test.log"
+#  rotate_every_kb: 10000    # Rotate file after 10 MB
+#  number_of_files: 7  
+
 #============================= Logging ====================================
 logging.level: info
 logging.to_files: true
