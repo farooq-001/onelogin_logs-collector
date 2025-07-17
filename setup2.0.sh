@@ -8,7 +8,7 @@ read -p "Enter CLIENT_SECRET: " CLIENT_SECRET
 
 # Display inputs
 echo ""
-echo "You have entered the following:"
+echo "🔐 You Have Entered The Following ONELOGIN-API Keys:"
 echo "CLIENT_ID     : $CLIENT_ID"
 echo "CLIENT_SECRET : $CLIENT_SECRET"
 echo ""
@@ -20,11 +20,14 @@ if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
     exit 1
 fi
 
-# Ensure /opt exists
-mkdir -p /opt
+# Ensure /opt/onelogin/ exists
+INSTALL_DIR="/opt/onelogin"
+rm -rf $INSTALL_DIR/onelogin_audit.old
+mkdir -p "$INSTALL_DIR"
+mv  $INSTALL_DIR/onelogin_audit.py  $INSTALL_DIR/onelogin_audit.old
 
-# Create Python script with embedded secrets
-cat <<EOF > /opt/onelogin_audit.py
+# Create Python script inside /opt/onelogin/
+cat <<EOF > $INSTALL_DIR/onelogin_audit.py
 import requests
 import json
 import time
@@ -37,9 +40,9 @@ CLIENT_ID = '${CLIENT_ID}'
 CLIENT_SECRET = '${CLIENT_SECRET}'
 BASE_URL = 'https://api.us.onelogin.com'
 EVENTS_ENDPOINT = '/api/1/events'
-SIEM_OUTPUT_FILE = 'onelogin_siem_logs.jsonl'
+SIEM_OUTPUT_FILE = 'onelogin_siem_logs.json'
 REGISTRY_FILE = 'log_registry.json'
-FETCH_INTERVAL_SECONDS = 300
+FETCH_INTERVAL_SECONDS = 30
 UDP_HOST = '127.0.0.1'
 UDP_PORT = 12514
 
@@ -206,8 +209,8 @@ if __name__ == '__main__':
     run_fetcher()
 EOF
 
-# Set permissions
-chmod +x /opt/onelogin_audit.py
+# Make script executable
+chmod +x "$INSTALL_DIR/onelogin_audit.py"
 
 # Create systemd service
 cat <<EOF > /etc/systemd/system/onelogin_audit.service
@@ -216,11 +219,11 @@ Description=OneLogin Audit Script
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/env python3 /opt/onelogin_audit.py
+ExecStart=/usr/bin/env python3 $INSTALL_DIR/onelogin_audit.py
 Restart=always
 RestartSec=5
 User=root
-WorkingDirectory=/opt
+WorkingDirectory=$INSTALL_DIR
 StandardOutput=journal
 StandardError=journal
 
@@ -235,5 +238,6 @@ systemctl start onelogin_audit.service
 
 echo ""
 echo "✅ OneLogin audit service installed and started."
-echo "📁 Log file path: /opt/onelogin_siem_logs.jsonl"
-echo "📒 Registry file: /opt/log_registry.json"
+echo "📂 Directory: $INSTALL_DIR"
+echo "📁 Log file : $INSTALL_DIR/onelogin_siem_logs.json"
+echo "📒 Registry : $INSTALL_DIR/log_registry.json"
