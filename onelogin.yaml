@@ -5,18 +5,16 @@ filebeat.inputs:
 - type: log
   enabled: true
   paths:
-    - "/var/log/capture/alerts-*.json"
+    - "/opt/onelogin/onelogin_siem_logs.json"
   close_inactive: 10s
   scan_frequency: 60s
 
   fields:
-    log.type: "paf_alerts"
-    sensor_id: "DM_HY_S01"
-    client_id: "d3b6842d"
+    log.type: "onelogin"
   fields_under_root: true
 
 #================== Filebeat Global Options ===============================
-filebeat.registry.path: /opt/conf/etc/registry/onelogin
+filebeat.registry.path: /opt/docker/conf/etc/registry/blu_onelogin
 
 #========================= Filebeat Modules ===============================
 filebeat.config.modules:
