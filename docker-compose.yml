@@ -1,12 +1,15 @@
-blu_onelogin:
-  image: docker.elastic.co/beats/filebeat:6.8.7
-  container_name: blu_onelogin
-  network_mode: host
-  volumes:
-    - /opt/onelogin:/opt/onelogin
-    - /opt/docker/conf/onelogin.yaml:/usr/share/filebeat/filebeat.yml
-    - /opt/docker/conf/etc/registry:/opt/conf/etc/registry
-  environment:
-    - BEAT_PATH=/usr/share/filebeat
-  user: root
-  restart: always
+version: '3.7'  
+
+services:
+  blu_onelogin:
+    image: docker.elastic.co/beats/filebeat:6.8.7
+    container_name: blu_onelogin
+    network_mode: host
+    volumes:
+      - /opt/onelogin:/opt/onelogin
+      - /opt/docker/conf/onelogin.yaml:/usr/share/filebeat/filebeat.yml
+      - /opt/docker/conf/etc/registry:/opt/docker/conf/etc/registry
+    environment:
+      - BEAT_PATH=/usr/share/filebeat
+    user: root
+    restart: always
