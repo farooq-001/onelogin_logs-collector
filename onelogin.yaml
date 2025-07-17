@@ -1,17 +1,16 @@
-##################### Filebeat Configuration - PAF #########################
+##################### Filebeat Configuration - OneLogin #########################
 
 #======================= Filebeat Inputs =============================
 filebeat.inputs:
-- type: log
-  enabled: true
-  paths:
-    - "/opt/onelogin/onelogin_siem_logs.json"
-  close_inactive: 10s
-  scan_frequency: 60s
-
-  fields:
-    log.type: "onelogin"
-  fields_under_root: true
+  - type: log
+    enabled: true
+    paths:
+      - "/opt/onelogin/onelogin_siem_logs.json"
+    close_inactive: 10s
+    scan_frequency: 60s
+    fields:
+      log.type: "onelogin"
+    fields_under_root: true
 
 #================== Filebeat Global Options ===============================
 filebeat.registry.path: /opt/docker/conf/etc/registry/blu_onelogin
@@ -24,10 +23,10 @@ filebeat.config.modules:
 
 #========================= Logstash Output ===============================
 output.logstash:
-  bulk_max_size: 8192
   hosts: ["127.0.0.1:12154"]
   loadbalance: true
   worker: 5
+  bulk_max_size: 8192
 
 #============================= Logging ====================================
 logging.level: info
@@ -44,4 +43,3 @@ queue.mem:
   events: 4096
   flush.min_events: 512
   flush.timeout: 1s
-
