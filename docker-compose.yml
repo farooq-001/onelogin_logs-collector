@@ -6,7 +6,7 @@ blu_onelogin:
     - /opt/onelogin:/opt/onelogin
     - /opt/docker/conf/onelogin.yaml:/usr/share/filebeat/filebeat.yml
     - /opt/docker/conf/etc/registry:/opt/conf/etc/registry
-    environment:
-      - BEAT_PATH=/usr/share/filebeat
-    user: root
-    restart: always
+  environment:
+    - BEAT_PATH=/usr/share/filebeat
+  user: root
+  restart: always
