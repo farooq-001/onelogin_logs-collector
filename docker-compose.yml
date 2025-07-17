@@ -1,0 +1,10 @@
+filebeat-1:
+  image: docker.elastic.co/beats/filebeat:6.8.7
+  container_name: onelogin
+  network_mode: host
+  volumes:
+    - ${LOG_PATH}:/var/log/capture
+    - /opt/filebeat/conf/onelogin.yaml:/usr/share/filebeat/filebeat.yml
+    - /opt/filebeat/conf/etc/registry:/usr/share/filebeat/data
+  user: root
+  restart: always
