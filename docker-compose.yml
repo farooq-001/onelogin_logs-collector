@@ -6,9 +6,9 @@ services:
     container_name: blu_onelogin
     network_mode: host
     volumes:
-      - /opt/onelogin:/opt/onelogin
-      - /opt/docker/conf/onelogin.yaml:/usr/share/filebeat/filebeat.yml
-      - /opt/docker/conf/etc/registry:/opt/docker/conf/etc/registry
+      - /opt/docker:/opt/docker
+      - /opt/docker/onelgin/onelogin.yaml:/usr/share/filebeat/filebeat.yml
+      - /opt/docker/onelogin/registry:/opt/docker/onelogin/registry
     environment:
       - BEAT_PATH=/usr/share/filebeat
     user: root
