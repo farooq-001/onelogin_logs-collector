@@ -13,7 +13,7 @@ filebeat.inputs:
     fields_under_root: true
 
 #================== Filebeat Global Options ===============================
-filebeat.registry.path: /opt/docker/conf/etc/registry/blu_onelogin
+filebeat.registry.path: /opt/docker/onelogin/registry/onelogin
 
 #========================= Filebeat Modules ===============================
 filebeat.config.modules:
